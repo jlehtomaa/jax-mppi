@@ -1,4 +1,4 @@
-# JAX_MPPI
+# jax-mppi
 Model Predictive Path Integral (MPPI) control with JAX.
 
 This repo contains two implementations of the MPPI algo.
