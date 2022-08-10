@@ -6,6 +6,7 @@ authors = ["jlehtomaa <jere.lehtomaa@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+numpy = "^1.23.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
