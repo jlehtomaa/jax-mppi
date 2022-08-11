@@ -98,7 +98,7 @@ class CEMPPI(Controller):
 
         # Add weighted noise to current control plan.
         weighted_ctrls = self.plan + weights.T @ noise # (ctrl_dim,)
-        weighted_ctrls = np.clip(weighted_ctrls, self._act_min, self.act_max)
+        weighted_ctrls = np.clip(weighted_ctrls, self._act_min, self._act_max)
 
         # Roll over one action, and repeat the last action.
         self.plan = np.roll(weighted_ctrls, -self.act_dim)

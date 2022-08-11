@@ -5,8 +5,6 @@ Example use:
 python main.py --algo cemppi --horizon 30
 """
 import argparse
-import gym
-#from gym.wrappers.monitoring.video_recorder import VideoRecorder
 from jax_mppi.controllers import MPPI, CEMPPI
 from jax_mppi.utils import make_env
 
@@ -56,8 +54,6 @@ def main():
         act = controller.get_action(obs.reshape((-1,1)))
         obs, rew, done, _ = env.step(act)
         cum_rew += rew
-        #env.render()
-    #env.render()
     env.close()
 
 if __name__ == "__main__":
