@@ -1,15 +1,15 @@
 # jax-mppi
 Model Predictive Path Integral (MPPI) control with JAX.
 
-This repo contains two implementations of the MPPI algo.
+This repo contains two implementations of the MPPI algorithm.
 The [pendulum](https://gym.openai.com/envs/Pendulum-v0/) environment from the OpenAI gym works as a simple test task to illustrate the techniques.
 The two algorithm versions are:
 
-A standard MPPI by [Williams et al. 2017](https://ieeexplore.ieee.org/document/7989202). Some parts of the code follow the control library [by Shunichi09](https://github.com/Shunichi09/PythonLinearNonlinearControl). Some modifications are from [this](https://github.com/google-research/pddm) paper by Google.
+- A standard MPPI by [Williams et al. 2017](https://ieeexplore.ieee.org/document/7989202). Some parts of the code follow the control library [by Shunichi09](https://github.com/Shunichi09/PythonLinearNonlinearControl). Some additional modifications are based on [this](https://github.com/google-research/pddm) paper by Google.
 
-The [MPOPIS](https://github.com/sisl/MPOPIS) version with adaptive importance sampling. It uses a cross entropy method to iteratively update the samling distribution, often achieving higher performance with fewer samples than the standard MPPI.
+- The [MPOPIS](https://github.com/sisl/MPOPIS) algorithm with adaptive importance sampling. This version uses a cross entropy method to iteratively update the control samling distribution, often achieving higher performance with fewer samples than the standard MPPI.
 
-Both algorithms here rely on [JAX](https://github.com/google/jax) to implement the model rollout functions. JAX makes an excellent tool for sampling-based model predictive control (MPC) as it allows to replace for-loops with the efficient [scan](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html) procedure, and to vectorize and compile the sampling step to achieve very high efficiency.
+Both algorithms heavily rely on [JAX](https://github.com/google/jax) to implement the model rollout functions. JAX makes an excellent tool for sampling-based model predictive control (MPC) as it allows to replace for-loops over the system dynamics with the efficient [scan](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html). In addition, JAX allows vectorizing and jit-compiling the sampling step to achieve very high efficiency.
 
 ## Example use
 
@@ -33,7 +33,6 @@ bling, Danica Kragic, and Komei Sugiura, editors, Proceedings of the Con-
 ference on Robot Learning, volume 100 of Proceedings of Machine Learning
 Research, pages 1101–1112. PMLR, 30 Oct–01 Nov 2020.
 
-Dylan M. Asmar, Ransalu Senanayake, Shawn Manuel, and Mykel J. Kochen-
-derfer. Model predictive optimized path integral strategies, 2022.
+Dylan M. Asmar, Ransalu Senanayake, Shawn Manuel, and Mykel J. Kochenderfer. Model predictive optimized path integral strategies, 2022.
 
 The [control library by Shunichi09](https://github.com/Shunichi09/PythonLinearNonlinearControl).
