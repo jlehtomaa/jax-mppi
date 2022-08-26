@@ -2,12 +2,12 @@
 Model Predictive Path Integral (MPPI) control with JAX.
 
 This repo contains two implementations of the MPPI algorithm.
-The [pendulum](https://gym.openai.com/envs/Pendulum-v0/) environment from the OpenAI gym works as a simple test task to illustrate the techniques.
+The [pendulum](https://www.gymlibrary.dev/environments/classic_control/pendulum/) environment from the OpenAI gym works as a simple test task to illustrate the techniques.
 The two algorithm versions are:
 
 - A standard MPPI by [Williams et al. 2017](https://ieeexplore.ieee.org/document/7989202). Some parts of the code follow the control library [by Shunichi09](https://github.com/Shunichi09/PythonLinearNonlinearControl). Some additional modifications are based on [this](https://github.com/google-research/pddm) paper by Google.
 
-- The [MPOPIS](https://github.com/sisl/MPOPIS) algorithm with adaptive importance sampling. This version uses a cross entropy method to iteratively update the control samling distribution, often achieving higher performance with fewer samples than the standard MPPI.
+- A cross-entropy method from the [MPOPIS](https://github.com/sisl/MPOPIS) paper by Asmar et al. 2022. This version uses adaptive importance sampling to iteratively update the control samling distribution, often achieving higher performance with fewer samples than the standard MPPI.
 
 Both algorithms heavily rely on [JAX](https://github.com/google/jax) to implement the model rollout functions. JAX makes an excellent tool for sampling-based model predictive control (MPC) as it allows to replace for-loops over the system dynamics with the efficient [scan](https://jax.readthedocs.io/en/latest/_autosummary/jax.lax.scan.html). In addition, JAX allows vectorizing and jit-compiling the sampling step to achieve very high efficiency.
 
