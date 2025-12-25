@@ -64,37 +64,26 @@ class CEMPPI(Controller):
             Next control action to take.
         """
 
-        plan_orig = deepcopy(self.plan) # (ctrl_dim,)
-        cov = self.cov # (ctrl_dim, ctrl_dim)
+        plan_orig = self.plan  # (ctrl_dim,)
+        cov = self.cov  # (ctrl_dim, ctrl_dim)
 
         for i in range(self.cfg["opt_iters"]):
 
             noise = self._sample_noise(cov) # (n_samples, ctrl_dim)
-            acts = np.clip(self.plan + noise, self._act_min, self._act_max)
-            acts = acts.reshape(
-                (self.cfg["n_samples"], self.cfg["horizon"], self.act_dim))
-
-            _, costs = self.rollout_fn(obs, acts) # Ignore state trajectory.
-            costs = costs.sum(axis=1).squeeze() # (n_samples,)
-            costs /= (costs.std() + 1e-10) # Normalize
-
-            # if self.add_ctrl_cost:
-            #     cov_inv = np.linalg.inv(cov)
-            #     gamma = (1. / self.cfg["temperature"]) * (1 - self.cfg["alpha"])
-            #     ctrl_cost = gamma * plan_orig @ cov_inv @ (acts - plan_orig).T
-            #     costs += ctrl_cost
+            cov_inv = np.linalg.inv(cov)  # FIX
+            costs = self._simulate_model(obs, noise, cov_inv, plan_orig)
 
             if i < self.cfg["opt_iters"] - 1:
                 order = np.argsort(costs)
                 elite = noise[order[:self.n_elites], :] # (n_elites, ctrl_dim)
+
                 cov = np.cov(elite, rowvar=False) + np.eye(self.ctrl_dim) * 1e-8
-                self.plan += np.mean(elite, axis=0) # Avg. best performing noise.
+                self.plan = self.plan + np.mean(elite, axis=0)
 
         noise += (self.plan - plan_orig) # (n_samples, ctrl_dim)
         self.plan = plan_orig
 
-        weights = np.exp((self.cfg["temperature"]) * (np.min(costs) - costs))
-        weights /= np.sum(weights) # (n_samples,)
+        weights = self._compute_weights(costs)
 
         # Add weighted noise to current control plan.
         weighted_ctrls = self.plan + weights.T @ noise # (ctrl_dim,)
@@ -104,6 +93,31 @@ class CEMPPI(Controller):
         self.plan = np.roll(weighted_ctrls, -self.act_dim)
         self.plan[-self.act_dim:] = self.plan[-2*self.act_dim:-self.act_dim]
         return weighted_ctrls[:self.act_dim]
+
+    def _compute_weights(self, costs):
+
+        norm_costs = self.cfg["temperature"] * (np.min(costs) - costs)
+        weights = np.exp(norm_costs)
+        weights /= np.sum(weights)
+
+        return weights
+
+
+    def _simulate_model(self, obs, noise, cov_inv, plan_orig):
+
+        acts = self.plan + noise
+
+        gamma = (1. / self.cfg["temperature"]) * (1 - self.cfg["alpha"])
+        ctrl_costs = gamma * plan_orig @ cov_inv @ (acts - plan_orig).T
+
+        act_roll_shape = (self.cfg["n_samples"], self.cfg["horizon"], self.act_dim)
+        acts = acts.reshape(act_roll_shape)
+        _, costs = self.rollout_fn(obs, acts)
+
+        costs = costs.sum(axis=1).squeeze() # (n_samples,)
+
+        return costs + ctrl_costs
+
 
     def _sample_noise(self, cov=None):
         """Get noise for constructing perturbed action sequences.
