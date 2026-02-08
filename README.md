@@ -1,7 +1,3 @@
-todo:
-- poetry to uv
-- gym to gymnasium
-
 # jax-mppi
 Model Predictive Path Integral (MPPI) control with JAX.
 
